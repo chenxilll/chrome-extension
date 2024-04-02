@@ -50,7 +50,7 @@ TabsOFF is a Chrome Extension that intelligently organizes open tabs by time/day
 ## Technical Details
 ### User Interface
 Key Elements:
-Pop-Up Dashboard: Quick overview of unused tabs categorized by the last accessed time.
+Pop-Up Dashboard: Quick overview of unused tabs categorized by the last accessed time (thresholds will be catergorized by default: days which can be changed in setting).
 
 Sidebar for Detailed Organization: A collapsible sidebar that categorizes tabs more extensively.
 
