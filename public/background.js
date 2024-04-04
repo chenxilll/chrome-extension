@@ -36,3 +36,26 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     });
   }
 });
+
+chrome.tabs.onCreated.addListener((tab) => {
+  // Check if the clicked menu item is 'captureSnippet'
+
+  // Retrieve the existing snippets from chrome.storage.local
+  chrome.storage.local.get({ snippets: [] }, (result) => {
+    const snippets = result.snippets;
+
+    // Create a new snippet object with a unique ID and the selected text
+    const newSnippet = {
+      id: Date.now(),
+      text: Date.now(),
+    };
+
+    // Add the new snippet to the array of snippets
+    snippets.push(newSnippet);
+
+    // Save the updated array of snippets to chrome.storage.local
+    chrome.storage.local.set({ snippets }, () => {
+      console.log('Snippet saved');
+    });
+  });
+});
