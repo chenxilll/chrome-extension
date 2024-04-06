@@ -1,3 +1,5 @@
+let id_to_delete = "";
+
 // This function is called when the extension is installed or updated
 chrome.runtime.onInstalled.addListener(() => {
   // Create a context menu item
@@ -37,30 +39,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
-// chrome.tabs.onCreated.addListener((tab) => {
-//   // Check if the clicked menu item is 'captureSnippet'
-
-//   // Retrieve the existing snippets from chrome.storage.local
-//   chrome.storage.local.get({ snippets: [] }, (result) => {
-//     const snippets = result.snippets;
-
-//     // Create a new snippet object with a unique ID and the selected text
-//     const newSnippet = {
-//       id: Date.now(),
-//       text: Date.now(),
-//     };
-
-//     // Add the new snippet to the array of snippets
-//     snippets.push(newSnippet);
-
-//     // Save the updated array of snippets to chrome.storage.local
-//     chrome.storage.local.set({ snippets }, () => {
-//       console.log('Snippet saved');
-//     });
-//   });
-// });
-
-
 chrome.tabs.onCreated.addListener((tab) => {
   // Retrieve the existing snippets from chrome.storage.local
   chrome.storage.local.get({ snippets: [] }, (result) => {
@@ -92,6 +70,12 @@ chrome.tabs.onActivated.addListener(activeInfo => {
 
   chrome.storage.local.get({snippets: []}, (result) => {
     let snippets = result.snippets;
+
+    const index = snippets.findIndex(snippet => snippet.id === id_to_delete);
+    if (index !== -1) {
+      snippets.splice(index, 1);
+    }
+
     let found = snippets.find(snippet => snippet.id === tabId);
 
     if (found) {
@@ -131,4 +115,20 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       });
     });
   }
+});
+
+chrome.tabs.onRemoved.addListener(tabId => {
+  id_to_delete = tabId;
+  chrome.storage.local.get({ snippets: [] }, (result) => {
+    let snippets = result.snippets;
+    console.log("snippets: ", snippets)
+    console.log("tabId:", tabId)
+    const index = snippets.findIndex(snippet => snippet.id === tabId);
+    if (index !== -1) {
+      snippets.splice(index, 1);
+      chrome.storage.local.set({ snippets }, () => {
+        console.log(`Tab ${tabId} removed and corresponding entry deleted.`);
+      });
+    }
+  });
 });
