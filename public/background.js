@@ -108,3 +108,27 @@ chrome.tabs.onActivated.addListener(activeInfo => {
     });
   });
 });
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete') {
+    const currentTime = new Date();
+
+    chrome.storage.local.get({ snippets: [] }, (result) => {
+      let snippets = result.snippets;
+      let found = snippets.find(snippet => snippet.id === tabId);
+
+      if (found) {
+        found.text = `Updated at: ${currentTime.toLocaleString()}`;
+      } else {
+        snippets.push({
+          id: tabId,
+          text: `Updated at: ${currentTime.toLocaleString()}`
+        });
+      }
+
+      chrome.storage.local.set({ snippets }, () => {
+        console.log(`Tab ${tabId} updated and time updated.`);
+      });
+    });
+  }
+});
