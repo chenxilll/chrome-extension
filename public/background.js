@@ -1,31 +1,31 @@
-let id_to_delete = "";
+let tabIdToDelete = "";
+let windowIdToDelete = "";
 
 // This function is called when the extension is installed or updated
 chrome.runtime.onInstalled.addListener(() => {
   // Create a context menu item
-  // See: https://developer.chrome.com/docs/extensions/reference/api/contextMenus#method-create
   chrome.contextMenus.create({
-    id: 'captureSnippet', // Unique identifier for the context menu item
-    title: 'Capture Snippet', // Text to be displayed in the context menu
-    contexts: ['selection'], // Show the context menu item only when text is selected
+    id: 'captureSnippet',
+    title: 'Capture Snippet',
+    contexts: ['selection'],
   });
 });
 
 // This function is called when a context menu item is clicked
-// See: https://developer.chrome.com/docs/extensions/reference/api/contextMenus#event-onClicked
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  // Check if the clicked menu item is 'captureSnippet'
   if (info.menuItemId === 'captureSnippet') {
-    const selectedText = info.selectionText; // Get the selected text
+    const selectedText = info.selectionText;
 
     // Retrieve the existing snippets from chrome.storage.local
     chrome.storage.local.get({ snippets: [] }, (result) => {
       const snippets = result.snippets;
 
-      // Create a new snippet object with a unique ID and the selected text
+      // Create a new snippet object with a unique ID, the selected text, and tab/window IDs
       const newSnippet = {
         id: Date.now(),
         text: selectedText,
+        tabId: tab.id, // Associate the snippet with the tab it was created in
+        windowId: tab.windowId // Associate the snippet with the window it was created in
       };
 
       // Add the new snippet to the array of snippets
@@ -40,26 +40,23 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 });
 
 chrome.tabs.onCreated.addListener((tab) => {
-  // Retrieve the existing snippets from chrome.storage.local
   chrome.storage.local.get({ snippets: [] }, (result) => {
     const snippets = result.snippets;
 
-    // Get the current date and time in a readable format
-    const currentDate = new Date(); // Create a Date object from the current timestamp
-    const readableDate = currentDate.toLocaleString(); // Convert to a readable format
+    const currentDate = new Date();
+    const readableDate = currentDate.toLocaleString();
 
-    // Create a new snippet object with a unique ID and the readable date
     const newSnippet = {
       id: Date.now(),
-      text: readableDate, // Use the readable date instead of the timestamp
+      text: readableDate,
+      tabId: tab.id,
+      windowId: tab.windowId
     };
 
-    // Add the new snippet to the array of snippets
     snippets.push(newSnippet);
 
-    // Save the updated array of snippets to chrome.storage.local
     chrome.storage.local.set({ snippets }, () => {
-      console.log('Snippet saved with readable date');
+      console.log('Snippet saved with tab and window IDs');
     });
   });
 });
@@ -71,19 +68,21 @@ chrome.tabs.onActivated.addListener(activeInfo => {
   chrome.storage.local.get({snippets: []}, (result) => {
     let snippets = result.snippets;
 
-    const index = snippets.findIndex(snippet => snippet.id === id_to_delete);
+    const index = snippets.findIndex(snippet => snippet.id === tabIdToDelete);
     if (index !== -1) {
       snippets.splice(index, 1);
     }
 
-    let found = snippets.find(snippet => snippet.id === tabId);
+    let found = snippets.find(snippet => snippet.tabId === tabId);
 
     if (found) {
       found.text = `Activated at: ${currentTime.toLocaleString()}`;
     } else {
       snippets.push({
         id: tabId,
-        text: `Activated at: ${currentTime.toLocaleString()}`
+        text: `Activated at: ${currentTime.toLocaleString()}`,
+        tabId: tabId,
+        windowId: activeInfo.windowId
       });
     }
 
@@ -99,14 +98,16 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
     chrome.storage.local.get({ snippets: [] }, (result) => {
       let snippets = result.snippets;
-      let found = snippets.find(snippet => snippet.id === tabId);
+      let found = snippets.find(snippet => snippet.tabId === tabId);
 
       if (found) {
         found.text = `Updated at: ${currentTime.toLocaleString()}`;
       } else {
         snippets.push({
           id: tabId,
-          text: `Updated at: ${currentTime.toLocaleString()}`
+          text: `Updated at: ${currentTime.toLocaleString()}`,
+          tabId: tabId,
+          windowId: tab.windowId
         });
       }
 
@@ -118,17 +119,27 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 chrome.tabs.onRemoved.addListener(tabId => {
-  id_to_delete = tabId;
+  tabIdToDelete = tabId;
   chrome.storage.local.get({ snippets: [] }, (result) => {
     let snippets = result.snippets;
-    console.log("snippets: ", snippets)
-    console.log("tabId:", tabId)
-    const index = snippets.findIndex(snippet => snippet.id === tabId);
+    const index = snippets.findIndex(snippet => snippet.tabId === tabId);
     if (index !== -1) {
       snippets.splice(index, 1);
       chrome.storage.local.set({ snippets }, () => {
         console.log(`Tab ${tabId} removed and corresponding entry deleted.`);
       });
     }
+  });
+});
+
+// This function handles window removal
+chrome.windows.onRemoved.addListener(windowId => {
+  windowIdToDelete = windowId;
+  chrome.storage.local.get({ snippets: [] }, (result) => {
+    let snippets = result.snippets;
+    snippets = snippets.filter(snippet => snippet.windowId !== windowId);
+    chrome.storage.local.set({ snippets }, () => {
+      console.log(`All snippets associated with window ${windowId} removed.`);
+    });
   });
 });
