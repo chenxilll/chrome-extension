@@ -48,9 +48,9 @@ chrome.tabs.onCreated.addListener((tab) => {
 
     const newSnippet = {
       id: Date.now(),
-      text: readableDate,
+      text: `${tab.url}\nCreated at: ${readableDate}`,
       tabId: tab.id,
-      windowId: tab.windowId
+      windowId: tab.windowId,
     };
 
     snippets.push(newSnippet);
@@ -76,11 +76,11 @@ chrome.tabs.onActivated.addListener(activeInfo => {
     let found = snippets.find(snippet => snippet.tabId === tabId);
 
     if (found) {
-      found.text = `Activated at: ${currentTime.toLocaleString()}`;
+      found.text = `${tab.url}\nActivated at: ${currentTime.toLocaleString()}`;
     } else {
       snippets.push({
         id: tabId,
-        text: `Activated at: ${currentTime.toLocaleString()}`,
+        text: `${tab.url}\nActivated at: ${currentTime.toLocaleString()}`,
         tabId: tabId,
         windowId: activeInfo.windowId
       });
@@ -101,11 +101,11 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       let found = snippets.find(snippet => snippet.tabId === tabId);
 
       if (found) {
-        found.text = `Updated at: ${currentTime.toLocaleString()}`;
+        found.text = `${tab.url}\nUpdated at: ${currentTime.toLocaleString()}`;
       } else {
         snippets.push({
           id: tabId,
-          text: `Updated at: ${currentTime.toLocaleString()}`,
+          text: `${tab.url}\nUpdated at: ${currentTime.toLocaleString()}`,
           tabId: tabId,
           windowId: tab.windowId
         });
