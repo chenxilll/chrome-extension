@@ -3,12 +3,13 @@ import React, { useState } from 'react';
 export interface Snippet {
   id: number;
   text: string;
+  tabId: number; // Add tabId property to Snippet interface
 }
 
 export interface SnippetItemProps {
   snippet: Snippet;
   onEdit: (newSnippet: string) => void;
-  onDelete: () => void;
+  onDelete: (tabId: number) => void; // Change onDelete to accept tabId
 }
 
 export const SnippetItem: React.FC<SnippetItemProps> = ({ snippet, onEdit, onDelete }) => {
@@ -28,6 +29,10 @@ export const SnippetItem: React.FC<SnippetItemProps> = ({ snippet, onEdit, onDel
     navigator.clipboard.writeText(snippet.text);
   };
 
+  const handleDeleteClick = () => {
+    onDelete(snippet.tabId); // Pass tabId to onDelete function
+  };
+
   return (
     <li className="snippet-item">
       {isEditing ? (
@@ -43,7 +48,7 @@ export const SnippetItem: React.FC<SnippetItemProps> = ({ snippet, onEdit, onDel
           <span>{snippet.text}</span>
           <button onClick={handleEditClick}>Edit</button>
           <button onClick={handleCopyClick}>Copy</button>
-          <button onClick={onDelete}>Delete</button>
+          <button onClick={handleDeleteClick}>Delete</button> {/* Add onClick handler */}
         </div>
       )}
     </li>
