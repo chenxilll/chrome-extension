@@ -143,3 +143,14 @@ chrome.windows.onRemoved.addListener(windowId => {
     });
   });
 });
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'navigateToTab' && message.tabId) {
+    chrome.tabs.update(message.tabId, { active: true }, (tab) => {
+      // Focus the window of the tab as well
+      if (tab) {
+        chrome.windows.update(tab.windowId, { focused: true });
+      }
+    });
+  }
+});
