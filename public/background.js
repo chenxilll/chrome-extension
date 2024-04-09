@@ -25,7 +25,9 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
         id: Date.now(),
         text: selectedText,
         tabId: tab.id, // Associate the snippet with the tab it was created in
-        windowId: tab.windowId // Associate the snippet with the window it was created in
+        windowId: tab.windowId, // Associate the snippet with the window it was created in
+        time: Date.now(),
+        url: tab.url,
       };
 
       // Add the new snippet to the array of snippets
@@ -51,6 +53,8 @@ chrome.tabs.onCreated.addListener((tab) => {
       text: `${tab.url}\nCreated at: ${readableDate}`,
       tabId: tab.id,
       windowId: tab.windowId,
+      time: Date.now(),
+      url: tab.url,
     };
 
     snippets.push(newSnippet);
@@ -65,7 +69,7 @@ chrome.tabs.onActivated.addListener(activeInfo => {
   const tabId = activeInfo.tabId;
   const currentTime = new Date();
 
-  chrome.storage.local.get({snippets: []}, (result) => {
+  chrome.storage.local.get({ snippets: [] }, (result) => {
     let snippets = result.snippets;
 
     const index = snippets.findIndex(snippet => snippet.id === tabIdToDelete);
@@ -73,21 +77,30 @@ chrome.tabs.onActivated.addListener(activeInfo => {
       snippets.splice(index, 1);
     }
 
-    let found = snippets.find(snippet => snippet.tabId === tabId);
+    chrome.tabs.get(tabId, tab => {
+      if (chrome.runtime.lastError || !tab) {
+        console.error(chrome.runtime.lastError ? chrome.runtime.lastError.message : "Tab not found");
+        return;
+      }
 
-    if (found) {
-      found.text = `${tab.url}\nActivated at: ${currentTime.toLocaleString()}`;
-    } else {
-      snippets.push({
-        id: tabId,
-        text: `${tab.url}\nActivated at: ${currentTime.toLocaleString()}`,
-        tabId: tabId,
-        windowId: activeInfo.windowId
+      let found = snippets.find(snippet => snippet.tabId === tabId);
+
+      if (found) {
+        found.text = `${tab.url}\nActivated at: ${currentTime.toLocaleString()}`;
+        found.time = Date.now();
+      } else {
+        snippets.push({
+          id: tabId,
+          text: `${tab.url}\nActivated at: ${currentTime.toLocaleString()}`,
+          tabId: tabId,
+          windowId: activeInfo.windowId,
+          time: Date.now(),
+        });
+      }
+
+      chrome.storage.local.set({ snippets }, () => {
+        console.log(`Tab ${tabId} activated and time updated.`);
       });
-    }
-
-    chrome.storage.local.set({snippets}, () => {
-      console.log(`Tab ${tabId} activated and time updated.`);
     });
   });
 });
@@ -102,12 +115,15 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
       if (found) {
         found.text = `${tab.url}\nUpdated at: ${currentTime.toLocaleString()}`;
+        found.time = Date.now();
       } else {
         snippets.push({
           id: tabId,
           text: `${tab.url}\nUpdated at: ${currentTime.toLocaleString()}`,
           tabId: tabId,
-          windowId: tab.windowId
+          windowId: tab.windowId,
+          time: Date.now(),
+          url: tab.url,
         });
       }
 
