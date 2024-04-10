@@ -71,7 +71,7 @@ chrome.tabs.onActivated.addListener(activeInfo => {
 
   chrome.storage.local.get({ snippets: [] }, (result) => {
     let snippets = result.snippets;
-
+    snippets.sort((a, b) => a.time - b.time);
     const index = snippets.findIndex(snippet => snippet.id === tabIdToDelete);
     if (index !== -1) {
       snippets.splice(index, 1);
@@ -112,6 +112,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
     chrome.storage.local.get({ snippets: [] }, (result) => {
       let snippets = result.snippets;
+      snippets.sort((a, b) => a.time - b.time);
       let found = snippets.find(snippet => snippet.tabId === tabId);
 
       const snippetText = `${tab.title}\nUpdated at: ${currentTime.toLocaleString()}`;
