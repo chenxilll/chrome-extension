@@ -3,7 +3,7 @@ import './App.css';
 import { Snippet, SnippetList } from './components/SnippetList';
 
 // Define a sample snippet for initial state when local storage is empty
-const sample_snippet: Snippet = { id: 1, text: 'Sample snippet', tabId: 0};
+const sample_snippet: Snippet = { id: 1, text: 'Sample snippet', tabId: 0, url: '', time: ''};
 
 function App() {
   // Define the state variable for storing the list of snippets
@@ -36,25 +36,24 @@ function App() {
   };
 
   // Handler for deleting a snippet
-// Handler for deleting a snippet
-const handleDeleteSnippet = (id: number) => {
-  // Find the snippet with the provided ID
-  const snippetToDelete = snippets.find((snippet) => snippet.id === id);
-  if (snippetToDelete) {
-    const { id: snippetId, tabId } = snippetToDelete; // Extract snippetId and tabId
-    // Remove the tab associated with the snippet
-    chrome.tabs.remove(tabId, () => {
-      console.log(`Tab ${tabId} removed.`);
-    });
+  const handleDeleteSnippet = (id: number) => {
+    // Find the snippet with the provided ID
+    const snippetToDelete = snippets.find((snippet) => snippet.id === id);
+    if (snippetToDelete) {
+      const { id: snippetId, tabId } = snippetToDelete; // Extract snippetId and tabId
+      // Remove the tab associated with the snippet
+      chrome.tabs.remove(tabId, () => {
+        console.log(`Tab ${tabId} removed.`);
+      });
   
-    // Create a new array without the deleted snippet
-    const updatedSnippets = snippets.filter((snippet) => snippet.id !== snippetId);
-    // Update the state with the new array
-    setSnippets(updatedSnippets);
-    // Save the updated snippets to local storage
-    chrome.storage.local.set({ snippets: updatedSnippets });
-  }
-};
+      // Create a new array without the deleted snippet
+      const updatedSnippets = snippets.filter((snippet) => snippet.id !== snippetId);
+      // Update the state with the new array
+      setSnippets(updatedSnippets);
+      // Save the updated snippets to local storage
+      chrome.storage.local.set({ snippets: updatedSnippets });
+    }
+  };
 
   return (
     <div className="App">
