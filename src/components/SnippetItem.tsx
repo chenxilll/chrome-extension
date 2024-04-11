@@ -5,6 +5,7 @@ export interface Snippet {
   text: string;
   url: string;
   tabId: number; // Assuming tabId is part of your Snippet model now
+  time: string;
 }
 
 export interface SnippetItemProps {

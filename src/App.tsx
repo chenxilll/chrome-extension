@@ -17,6 +17,7 @@ function App() {
         setSnippets([sample_snippet]);
       } else {
         // If 'snippets' key exists in local storage, set the state with the stored snippets
+        result.snippets.sort((a: any, b: any) => a.time - b.time);
         setSnippets(result.snippets);
       }
     });
