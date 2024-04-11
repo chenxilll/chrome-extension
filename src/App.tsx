@@ -3,22 +3,37 @@ import './App.css';
 import { Snippet, SnippetList } from './components/SnippetList';
 
 // Define a sample snippet for initial state when local storage is empty
-const sample_snippet: Snippet = { id: 1, text: 'Sample snippet', tabId: 0, url: '', time: ''};
+const sample_snippet: Snippet = { id: 1, text: 'Sample snippet', tabId: 0, url: '', time: '' };
 
 function App() {
   // Define the state variable for storing the list of snippets
   const [snippets, setSnippets] = useState<Snippet[]>([]);
+  const [snippetsByCategory, setSnippetsByCategory] = useState<{
+    overWeek: Snippet[];
+    threeToSevenDays: Snippet[];
+    lessThanThreeDays: Snippet[];
+  }>({ overWeek: [], threeToSevenDays: [], lessThanThreeDays: [] });
 
-  // Use useEffect to load snippets from local storage when the component mounts
   useEffect(() => {
     chrome.storage.local.get('snippets', (result) => {
-      if (result.snippets === undefined) {
-        // If 'snippets' key doesn't exist in local storage, set the initial state with the sample snippet
-        setSnippets([sample_snippet]);
-      } else {
-        // If 'snippets' key exists in local storage, set the state with the stored snippets
-        result.snippets.sort((a: any, b: any) => a.time - b.time);
-        setSnippets(result.snippets);
+      if (result.snippets) {
+        const now = Date.now();
+        const sortedSnippets = {
+          overWeek: [],
+          threeToSevenDays: [],
+          lessThanThreeDays: []
+        };
+        result.snippets.forEach((snippet: Snippet) => {
+          const daysOpened = (now - parseInt(snippet.time)) / (1000 * 3600 * 24);
+          if (daysOpened > 7) {
+            sortedSnippets.overWeek.push(snippet);
+          } else if (daysOpened > 0.5) {
+            sortedSnippets.threeToSevenDays.push(snippet);
+          } else {
+            sortedSnippets.lessThanThreeDays.push(snippet);
+          }
+        });
+        setSnippetsByCategory(sortedSnippets);
       }
     });
   }, []);
@@ -45,7 +60,7 @@ function App() {
       chrome.tabs.remove(tabId, () => {
         console.log(`Tab ${tabId} removed.`);
       });
-  
+
       // Create a new array without the deleted snippet
       const updatedSnippets = snippets.filter((snippet) => snippet.id !== snippetId);
       // Update the state with the new array
@@ -58,12 +73,26 @@ function App() {
   return (
     <div className="App">
       <h1>Snippet Collector</h1>
-      {/* Render the SnippetList component with the snippets and event handlers */}
-      <SnippetList
-        snippets={snippets}
-        onEditSnippet={handleEditSnippet}
-        onDeleteSnippet={handleDeleteSnippet}
-      />
+      <div>
+        <SnippetList
+          title="More Than 7 Days"
+          snippets={snippetsByCategory.overWeek}
+          onEditSnippet={handleEditSnippet}
+          onDeleteSnippet={handleDeleteSnippet}
+        />
+        <SnippetList
+          title="More Than Half a Day"
+          snippets={snippetsByCategory.threeToSevenDays}
+          onEditSnippet={handleEditSnippet}
+          onDeleteSnippet={handleDeleteSnippet}
+        />
+        <SnippetList
+          title="Less Than Half a Day"
+          snippets={snippetsByCategory.lessThanThreeDays}
+          onEditSnippet={handleEditSnippet}
+          onDeleteSnippet={handleDeleteSnippet}
+        />
+      </div>
     </div>
   );
 }
