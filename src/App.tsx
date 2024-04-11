@@ -18,7 +18,11 @@ function App() {
     chrome.storage.local.get('snippets', (result) => {
       if (result.snippets) {
         const now = Date.now();
-        const sortedSnippets = {
+        const sortedSnippets: {
+          overWeek: Snippet[];
+          threeToSevenDays: Snippet[];
+          lessThanThreeDays: Snippet[];
+        } = {
           overWeek: [],
           threeToSevenDays: [],
           lessThanThreeDays: []
