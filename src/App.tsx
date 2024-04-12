@@ -62,25 +62,29 @@ const getCategory = (days: number): string => {
     chrome.storage.local.set({ snippets: updatedSnippets });
   };
 
-  // Handler for deleting a snippet
-  const handleDeleteSnippet = (id: number) => {
-    // Find the snippet with the provided ID
-    const snippetToDelete = snippets.find((snippet) => snippet.id === id);
-    if (snippetToDelete) {
-      const { id: snippetId, tabId } = snippetToDelete; // Extract snippetId and tabId
-      // Remove the tab associated with the snippet
-      chrome.tabs.remove(tabId, () => {
-        console.log(`Tab ${tabId} removed.`);
-      });
-
-      // Create a new array without the deleted snippet
-      const updatedSnippets = snippets.filter((snippet) => snippet.id !== snippetId);
-      // Update the state with the new array
-      setSnippets(updatedSnippets);
-      // Save the updated snippets to local storage
-      chrome.storage.local.set({ snippets: updatedSnippets });
+ // Handler for deleting a snippet
+const handleDeleteSnippet = (id: number) => {
+  // Retrieve snippets from local storage
+  chrome.storage.local.get('snippets', (result) => {
+    if (result.snippets) {
+      // Find the snippet with the provided ID
+      const snippetToDelete = result.snippets.find((snippet: Snippet) => snippet.id === id);
+      if (snippetToDelete) {
+        const { id: snippetId, tabId } = snippetToDelete; // Extract snippetId and tabId
+        
+        // Remove the snippet from local storage
+        const updatedSnippets = result.snippets.filter((snippet: Snippet) => snippet.id !== snippetId);
+        chrome.storage.local.set({ snippets: updatedSnippets }, () => {
+          // After deleting from local storage, remove the associated tab
+          chrome.tabs.remove(tabId, () => {
+            console.log(`Tab ${tabId} removed.`);
+          });
+        });
+      }
     }
-  };
+  });
+};
+
 
   return (
     <div className="App">
