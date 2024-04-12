@@ -7,40 +7,48 @@ const sample_snippet: Snippet = { id: 1, text: 'Sample snippet', tabId: 0, url: 
 
 function App() {
   // Define the state variable for storing the list of snippets
-  const [snippets, setSnippets] = useState<Snippet[]>([]);
-  const [snippetsByCategory, setSnippetsByCategory] = useState<{
-    overWeek: Snippet[];
-    threeToSevenDays: Snippet[];
-    lessThanThreeDays: Snippet[];
-  }>({ overWeek: [], threeToSevenDays: [], lessThanThreeDays: [] });
+// Define the state variable for storing the list of snippets
+const [snippets, setSnippets] = useState<Snippet[]>([]);
+const [snippetsByCategory, setSnippetsByCategory] = useState<{ [key: string]: Snippet[] }>({});
 
-  useEffect(() => {
-    chrome.storage.local.get('snippets', (result) => {
-      if (result.snippets) {
-        const now = Date.now();
-        const sortedSnippets: {
-          overWeek: Snippet[];
-          threeToSevenDays: Snippet[];
-          lessThanThreeDays: Snippet[];
-        } = {
-          overWeek: [],
-          threeToSevenDays: [],
-          lessThanThreeDays: []
-        };
-        result.snippets.forEach((snippet: Snippet) => {
-          const daysOpened = (now - parseInt(snippet.time)) / (1000 * 3600 * 24);
-          if (daysOpened > 7) {
-            sortedSnippets.overWeek.push(snippet);
-          } else if (daysOpened > 0.5) {
-            sortedSnippets.threeToSevenDays.push(snippet);
-          } else {
-            sortedSnippets.lessThanThreeDays.push(snippet);
-          }
-        });
-        setSnippetsByCategory(sortedSnippets);
-      }
-    });
-  }, []);
+// Define the list of thresholds and their corresponding category names
+const thresholds = [
+  { threshold: 7, category: 'Over a week' },
+  { threshold: 0.5, category: 'More than half a day' },
+  { threshold: 10*1000/(1000 * 3600 * 24), category: 'More than 10s' },
+  { threshold: 0, category: 'Less than half a day' }
+];
+
+useEffect(() => {
+  chrome.storage.local.get('snippets', (result) => {
+    if (result.snippets) {
+      const now = Date.now();
+      const sortedSnippets: { [key: string]: Snippet[] } = {};
+
+      result.snippets.forEach((snippet: Snippet) => {
+        const daysOpened = (now - parseInt(snippet.time)) / (1000 * 3600 * 24);
+        const category = getCategory(daysOpened);
+        // Initialize category array if it doesn't exist
+        if (!sortedSnippets[category]) {
+          sortedSnippets[category] = [];
+        }
+        sortedSnippets[category].push(snippet);
+      });
+      setSnippetsByCategory(sortedSnippets);
+    }
+  });
+}, []);
+
+// Function to determine category based on the number of days
+const getCategory = (days: number): string => {
+  for (const { threshold, category } of thresholds) {
+    if (days > threshold) {
+      return category;
+    }
+  }
+  // Default category if no threshold matches
+  return 'Unknown';
+};
 
   // Handler for editing a snippet
   const handleEditSnippet = (id: number, newText: string) => {
@@ -78,24 +86,15 @@ function App() {
     <div className="App">
       <h1>Snippet Collector</h1>
       <div>
-        <SnippetList
-          title="More Than 7 Days"
-          snippets={snippetsByCategory.overWeek}
-          onEditSnippet={handleEditSnippet}
-          onDeleteSnippet={handleDeleteSnippet}
-        />
-        <SnippetList
-          title="More Than Half a Day"
-          snippets={snippetsByCategory.threeToSevenDays}
-          onEditSnippet={handleEditSnippet}
-          onDeleteSnippet={handleDeleteSnippet}
-        />
-        <SnippetList
-          title="Less Than Half a Day"
-          snippets={snippetsByCategory.lessThanThreeDays}
-          onEditSnippet={handleEditSnippet}
-          onDeleteSnippet={handleDeleteSnippet}
-        />
+        {Object.keys(snippetsByCategory).map(category => (
+          <SnippetList
+            key={category}
+            title={category}
+            snippets={snippetsByCategory[category]}
+            onEditSnippet={handleEditSnippet}
+            onDeleteSnippet={handleDeleteSnippet}
+          />
+        ))}
       </div>
     </div>
   );
