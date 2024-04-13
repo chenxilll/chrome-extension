@@ -13,10 +13,12 @@ To install TabsOFF, follow these steps:
    git clone https://github.com/your-username/tabs-off.git
    
 2. Navigate to the project directory:
-cd tabs-off
+   ```bash
+   cd tabs-off
 
-3. Install the necessary packages:
-npm install
+4. Install the necessary packages:
+   ```bash
+   npm install
 
 
 ## Usage
