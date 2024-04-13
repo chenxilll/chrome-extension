@@ -14,7 +14,7 @@ To install TabsOFF, follow these steps:
    
 2. Navigate to the project directory:
    ```bash
-   cd tabs-off
+   cd chrome-extension
 
 4. Install the necessary packages:
    ```bash
