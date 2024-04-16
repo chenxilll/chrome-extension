@@ -121,7 +121,7 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Snippet Collector</h1>
+      <h1>TabsOFF</h1>
       <div>
         {thresholds.map((threshold, index) => (
           <div key={index}>
