@@ -70,28 +70,59 @@ function App() {
     setTabsByCategory(filteredTabs);
   }, [selectedThresholds]);
 
-  // Handler for deleting a tab
-  const handleDeleteTab = (id: number) => {
-    // Retrieve tabs from local storage
-    chrome.storage.local.get('tabs', (result) => {
-      if (result.tabs) {
-        // Find the tab with the provided ID
-        const tabToDelete = result.tabs.find((tab: Tab) => tab.id === id);
-        if (tabToDelete) {
-          const { id: mainId, tabId } = tabToDelete; // Extract mainId and tabId
+  // // Handler for deleting a tab
+  // const handleDeleteTab = (id: number) => {
+  //   // Retrieve tabs from local storage
+  //   chrome.storage.local.get('tabs', (result) => {
+  //     if (result.tabs) {
+  //       // Find the tab with the provided ID
+  //       const tabToDelete = result.tabs.find((tab: Tab) => tab.id === id);
+  //       if (tabToDelete) {
+  //         const { id: mainId, tabId } = tabToDelete; // Extract mainId and tabId
 
-          // Remove the tab from local storage
-          const updatedTabs = result.tabs.filter((tab: Tab) => tab.id !== mainId);
-          chrome.storage.local.set({ tabs: updatedTabs }, () => {
-            // After deleting from local storage, remove the associated tab
-            chrome.tabs.remove(tabId, () => {
-              console.log(`Tab ${tabId} removed.`);
-            });
+  //         // Remove the tab from local storage
+  //         const updatedTabs = result.tabs.filter((tab: Tab) => tab.id !== mainId);
+  //         chrome.storage.local.set({ tabs: updatedTabs }, () => {
+  //           // After deleting from local storage, remove the associated tab
+  //           chrome.tabs.remove(tabId, () => {
+  //             console.log(`Tab ${tabId} removed.`);
+  //           });
+  //         });
+  //       }
+  //     }
+  //   });
+  // };
+  // Handler for deleting a tab
+const handleDeleteTab = (id: number) => {
+  // Retrieve tabs from local storage
+  chrome.storage.local.get('tabs', (result) => {
+    if (result.tabs) {
+      // Find the tab with the provided ID
+      const tabToDelete = result.tabs.find((tab: Tab) => tab.id === id);
+      if (tabToDelete) {
+        const { id: mainId, tabId } = tabToDelete; // Extract mainId and tabId
+
+        // Remove the tab from local storage
+        const updatedTabs = result.tabs.filter((tab: Tab) => tab.id !== mainId);
+        chrome.storage.local.set({ tabs: updatedTabs }, () => {
+          // After deleting from local storage, remove the associated tab
+          chrome.tabs.remove(tabId, () => {
+            console.log(`Tab ${tabId} removed.`);
+            // Update tabsByCategory state after deletion
+            const updatedTabsByCategory = { ...tabsByCategory };
+            for (const category in updatedTabsByCategory) {
+              if (updatedTabsByCategory.hasOwnProperty(category)) {
+                updatedTabsByCategory[category] = updatedTabsByCategory[category].filter(tab => tab.id !== mainId);
+              }
+            }
+            setTabsByCategory(updatedTabsByCategory);
           });
-        }
+        });
       }
-    });
-  };
+    }
+  });
+};
+
 
   // Handler for toggling selected thresholds
   const handleThresholdToggle = (thresholdIndex: number) => {
