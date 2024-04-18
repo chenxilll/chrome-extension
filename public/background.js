@@ -5,50 +5,50 @@ let windowIdToDelete = "";
 chrome.runtime.onInstalled.addListener(() => {
   // Create a context menu item
   chrome.contextMenus.create({
-    id: 'captureSnippet',
-    title: 'Capture Snippet',
+    id: 'captureTab',
+    title: 'Capture Tab',
     contexts: ['selection'],
   });
 });
 
 // This function is called when a context menu item is clicked
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === 'captureSnippet') {
+  if (info.menuItemId === 'captureTab') {
     const selectedText = info.selectionText;
 
-    // Retrieve the existing snippets from chrome.storage.local
-    chrome.storage.local.get({ snippets: [] }, (result) => {
-      const snippets = result.snippets;
+    // Retrieve the existing tabs from chrome.storage.local
+    chrome.storage.local.get({ tabs: [] }, (result) => {
+      const tabs = result.tabs;
 
-      // Create a new snippet object with a unique ID, the selected text, and tab/window IDs
-      const newSnippet = {
+      // Create a new tab object with a unique ID, the selected text, and tab/window IDs
+      const newTab = {
         id: Date.now(),
         text: selectedText,
-        tabId: tab.id, // Associate the snippet with the tab it was created in
-        windowId: tab.windowId, // Associate the snippet with the window it was created in
+        tabId: tab.id, // Associate the tab with the tab it was created in
+        windowId: tab.windowId, // Associate the tab with the window it was created in
         time: Date.now(),
         url: tab.url,
       };
 
-      // Add the new snippet to the array of snippets
-      snippets.push(newSnippet);
+      // Add the new tab to the array of tabs
+      tabs.push(newTab);
 
-      // Save the updated array of snippets to chrome.storage.local
-      chrome.storage.local.set({ snippets }, () => {
-        console.log('Snippet saved');
+      // Save the updated array of tabs to chrome.storage.local
+      chrome.storage.local.set({ tabs }, () => {
+        console.log('Tab saved');
       });
     });
   }
 });
 
 chrome.tabs.onCreated.addListener((tab) => {
-  chrome.storage.local.get({ snippets: [] }, (result) => {
-    const snippets = result.snippets;
+  chrome.storage.local.get({ tabs: [] }, (result) => {
+    const tabs = result.tabs;
 
     const currentDate = new Date();
     const readableDate = currentDate.toLocaleString();
 
-    const newSnippet = {
+    const newTab = {
       id: Date.now(),
       text: `${tab.url}\nCreated at: ${readableDate}`,
       tabId: tab.id,
@@ -57,10 +57,10 @@ chrome.tabs.onCreated.addListener((tab) => {
       url: tab.url,
     };
 
-    snippets.push(newSnippet);
+    tabs.push(newTab);
 
-    chrome.storage.local.set({ snippets }, () => {
-      console.log('Snippet saved with tab and window IDs');
+    chrome.storage.local.set({ tabs }, () => {
+      console.log('Tab saved with tab and window IDs');
     });
   });
 });
@@ -69,12 +69,12 @@ chrome.tabs.onActivated.addListener(activeInfo => {
   const tabId = activeInfo.tabId;
   const currentTime = new Date();
 
-  chrome.storage.local.get({ snippets: [] }, (result) => {
-    let snippets = result.snippets;
-    snippets.sort((a, b) => a.time - b.time);
-    const index = snippets.findIndex(snippet => snippet.id === tabIdToDelete);
+  chrome.storage.local.get({ tabs: [] }, (result) => {
+    let tabs = result.tabs;
+    tabs.sort((a, b) => a.time - b.time);
+    const index = tabs.findIndex(tab => tab.id === tabIdToDelete);
     if (index !== -1) {
-      snippets.splice(index, 1);
+      tabs.splice(index, 1);
     }
 
     chrome.tabs.get(tabId, tab => {
@@ -83,13 +83,13 @@ chrome.tabs.onActivated.addListener(activeInfo => {
         return;
       }
 
-      let found = snippets.find(snippet => snippet.tabId === tabId);
+      let found = tabs.find(tab => tab.tabId === tabId);
 
       if (found) {
         found.text = `${tab.title}\nActivated at: ${currentTime.toLocaleString()}`;
         found.time = Date.now();
       } else {
-        snippets.push({
+        tabs.push({
           id: tabId,
           text: `${tab.title}\nActivated at: ${currentTime.toLocaleString()}`,
           tabId: tabId,
@@ -99,7 +99,7 @@ chrome.tabs.onActivated.addListener(activeInfo => {
         });
       }
 
-      chrome.storage.local.set({ snippets }, () => {
+      chrome.storage.local.set({ tabs }, () => {
         console.log(`Tab ${tabId} activated and time updated.`);
       });
     });
@@ -110,19 +110,19 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && tab.title) {
     const currentTime = new Date();
 
-    chrome.storage.local.get({ snippets: [] }, (result) => {
-      let snippets = result.snippets;
-      snippets.sort((a, b) => a.time - b.time);
-      let found = snippets.find(snippet => snippet.tabId === tabId);
+    chrome.storage.local.get({ tabs: [] }, (result) => {
+      let tabs = result.tabs;
+      tabs.sort((a, b) => a.time - b.time);
+      let found = tabs.find(tab => tab.tabId === tabId);
 
-      const snippetText = `${tab.title}\nUpdated at: ${currentTime.toLocaleString()}`;
+      const tabText = `${tab.title}\nUpdated at: ${currentTime.toLocaleString()}`;
 
       if (found) {
-        found.text = snippetText;
+        found.text = tabText;
       } else {
-        snippets.push({
+        tabs.push({
           id: tabId,
-          text: snippetText,
+          text: tabText,
           tabId: tabId,
           windowId: tab.windowId,
           time: Date.now(),
@@ -130,7 +130,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         });
       }
 
-      chrome.storage.local.set({ snippets }, () => {
+      chrome.storage.local.set({ tabs }, () => {
         console.log(`Tab ${tabId} updated and time updated.`);
       });
     });
@@ -139,12 +139,12 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 chrome.tabs.onRemoved.addListener(tabId => {
   tabIdToDelete = tabId;
-  chrome.storage.local.get({ snippets: [] }, (result) => {
-    let snippets = result.snippets;
-    const index = snippets.findIndex(snippet => snippet.tabId === tabId);
+  chrome.storage.local.get({ tabs: [] }, (result) => {
+    let tabs = result.tabs;
+    const index = tabs.findIndex(tab => tab.tabId === tabId);
     if (index !== -1) {
-      snippets.splice(index, 1);
-      chrome.storage.local.set({ snippets }, () => {
+      tabs.splice(index, 1);
+      chrome.storage.local.set({ tabs }, () => {
         console.log(`Tab ${tabId} removed and corresponding entry deleted.`);
       });
     }
@@ -154,11 +154,11 @@ chrome.tabs.onRemoved.addListener(tabId => {
 // This function handles window removal
 chrome.windows.onRemoved.addListener(windowId => {
   windowIdToDelete = windowId;
-  chrome.storage.local.get({ snippets: [] }, (result) => {
-    let snippets = result.snippets;
-    snippets = snippets.filter(snippet => snippet.windowId !== windowId);
-    chrome.storage.local.set({ snippets }, () => {
-      console.log(`All snippets associated with window ${windowId} removed.`);
+  chrome.storage.local.get({ tabs: [] }, (result) => {
+    let tabs = result.tabs;
+    tabs = tabs.filter(tab => tab.windowId !== windowId);
+    chrome.storage.local.set({ tabs }, () => {
+      console.log(`All tabs associated with window ${windowId} removed.`);
     });
   });
 });

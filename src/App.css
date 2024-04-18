@@ -9,17 +9,17 @@
     background-color: white;
   }
   
-  .snippet-list {
+  .tabs-list {
     list-style-type: none;
     padding: 0;
   }
   
-  .snippet-item {
+  .tab-item {
     margin-bottom: 1rem;
     padding: 0.5rem;
     border: 1px solid #ccc;
   }
   
-  .snippet-item button {
+  .tab-item button {
     margin-left: 0.5rem;
   }

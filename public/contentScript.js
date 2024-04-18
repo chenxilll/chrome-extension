@@ -7,7 +7,7 @@ document.addEventListener('mouseup', function (e) {
   if (selectedText.length > 0) {
     // Send a message to the background script with the selected text
     chrome.runtime.sendMessage(
-      { action: 'saveSnippet', data: selectedText },
+      { action: 'saveTab', data: selectedText },
       (response) => {
         // Log the response status from the background script
         console.log(response.status);

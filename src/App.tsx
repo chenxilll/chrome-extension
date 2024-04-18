@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import { Snippet, SnippetList } from './components/SnippetList';
+import { Tab, TabsList } from './components/TabsList';
 
-// Define a sample snippet for initial state when local storage is empty
-const sample_snippet: Snippet = { id: 1, text: 'Sample snippet', tabId: 0, url: '', time: '' };
 
 function App() {
-  // Define the state variable for storing the list of snippets
-  const [snippets, setSnippets] = useState<Snippet[]>([]);
-  const [snippetsByCategory, setSnippetsByCategory] = useState<{ [key: string]: Snippet[] }>({});
+  // Define the state variable for storing the list of tabs
+  // const [tabs, setTabs] = useState<Tab[]>([]);
+  const [tabsByCategory, setTabsByCategory] = useState<{ [key: string]: Tab[] }>({});
   const [selectedThresholds, setSelectedThresholds] = useState<number[]>([]);
 
   // Define the list of thresholds and their corresponding category names
@@ -21,21 +19,21 @@ function App() {
   ];
 
   useEffect(() => {
-    chrome.storage.local.get(['snippets', 'selectedThresholds'], (result) => {
-      if (result.snippets) {
+    chrome.storage.local.get(['tabs', 'selectedThresholds'], (result) => {
+      if (result.tabs) {
         const now = Date.now();
-        const sortedSnippets: { [key: string]: Snippet[] } = {};
+        const sortedTabs: { [key: string]: Tab[] } = {};
 
-        result.snippets.forEach((snippet: Snippet) => {
-          const daysOpened = (now - parseInt(snippet.time)) / (1000 * 3600 * 24);
+        result.tabs.forEach((tab: Tab) => {
+          const daysOpened = (now - parseInt(tab.time)) / (1000 * 3600 * 24);
           const category = getCategory(daysOpened);
           // Initialize category array if it doesn't exist
-          if (!sortedSnippets[category]) {
-            sortedSnippets[category] = [];
+          if (!sortedTabs[category]) {
+            sortedTabs[category] = [];
           }
-          sortedSnippets[category].push(snippet);
+          sortedTabs[category].push(tab);
         });
-        setSnippetsByCategory(sortedSnippets);
+        setTabsByCategory(sortedTabs);
       }
       if (result.selectedThresholds) {
         setSelectedThresholds(result.selectedThresholds);
@@ -58,45 +56,33 @@ function App() {
     return 'Unknown';
   };
 
-  // Filter snippets based on selected thresholds
+  // Filter tabs based on selected thresholds
   useEffect(() => {
-    const filteredSnippets: { [key: string]: Snippet[] } = {};
-    for (const category in snippetsByCategory) {
-      if (snippetsByCategory.hasOwnProperty(category)) {
+    const filteredTabs: { [key: string]: Tab[] } = {};
+    for (const category in tabsByCategory) {
+      if (tabsByCategory.hasOwnProperty(category)) {
         const thresholdIndex = thresholds.findIndex(threshold => threshold.category === category);
         if (selectedThresholds.includes(thresholdIndex)) {
-          filteredSnippets[category] = snippetsByCategory[category];
+          filteredTabs[category] = tabsByCategory[category];
         }
       }
     }
-    setSnippetsByCategory(filteredSnippets);
+    setTabsByCategory(filteredTabs);
   }, [selectedThresholds]);
 
-  // Handler for editing a snippet
-  const handleEditSnippet = (id: number, newText: string) => {
-    // Create a new array with the updated snippet
-    const updatedSnippets = snippets.map((snippet) =>
-      snippet.id === id ? { ...snippet, text: newText } : snippet
-    );
-    // Update the state with the new array
-    setSnippets(updatedSnippets);
-    // Save the updated snippets to local storage
-    chrome.storage.local.set({ snippets: updatedSnippets });
-  };
+  // Handler for deleting a tab
+  const handleDeleteTab = (id: number) => {
+    // Retrieve tabs from local storage
+    chrome.storage.local.get('tabs', (result) => {
+      if (result.tabs) {
+        // Find the tab with the provided ID
+        const tabToDelete = result.tabs.find((tab: Tab) => tab.id === id);
+        if (tabToDelete) {
+          const { id: mainId, tabId } = tabToDelete; // Extract mainId and tabId
 
-  // Handler for deleting a snippet
-  const handleDeleteSnippet = (id: number) => {
-    // Retrieve snippets from local storage
-    chrome.storage.local.get('snippets', (result) => {
-      if (result.snippets) {
-        // Find the snippet with the provided ID
-        const snippetToDelete = result.snippets.find((snippet: Snippet) => snippet.id === id);
-        if (snippetToDelete) {
-          const { id: snippetId, tabId } = snippetToDelete; // Extract snippetId and tabId
-
-          // Remove the snippet from local storage
-          const updatedSnippets = result.snippets.filter((snippet: Snippet) => snippet.id !== snippetId);
-          chrome.storage.local.set({ snippets: updatedSnippets }, () => {
+          // Remove the tab from local storage
+          const updatedTabs = result.tabs.filter((tab: Tab) => tab.id !== mainId);
+          chrome.storage.local.set({ tabs: updatedTabs }, () => {
             // After deleting from local storage, remove the associated tab
             chrome.tabs.remove(tabId, () => {
               console.log(`Tab ${tabId} removed.`);
@@ -133,13 +119,12 @@ function App() {
             <label>{threshold.category}</label>
           </div>
         ))}
-        {Object.keys(snippetsByCategory).map(category => (
-          <SnippetList
+        {Object.keys(tabsByCategory).map(category => (
+          <TabsList
             key={category}
             title={category}
-            snippets={snippetsByCategory[category]}
-            onEditSnippet={handleEditSnippet}
-            onDeleteSnippet={handleDeleteSnippet}
+            tabs={tabsByCategory[category]}
+            onDeleteTab={handleDeleteTab}
           />
         ))}
       </div>

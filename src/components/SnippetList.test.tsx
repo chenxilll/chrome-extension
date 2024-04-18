@@ -1,41 +1,41 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { SnippetList } from './SnippetList';
-import { Snippet } from './SnippetItem';
+import { TabsList } from './TabsList';
+import { Tab } from './TabsItem';
 
-describe('SnippetList', () => {
-  const sampleSnippets: Snippet[] = [
-    { id: 1, text: 'First snippet' },
-    { id: 2, text: 'Second snippet' },
+describe('TabsList', () => {
+  const sampletabs: Tab[] = [
+    { id: 1, text: 'First tab' },
+    { id: 2, text: 'Second tab' },
   ];
 
-  it('renders a list of snippets', () => {
-    render(<SnippetList snippets={sampleSnippets} onEditSnippet={() => {}} onDeleteSnippet={() => {}} />);
-    expect(screen.getByText('First snippet')).toBeInTheDocument();
-    expect(screen.getByText('Second snippet')).toBeInTheDocument();
+  it('renders a list of tabs', () => {
+    render(<TabsList tabs={sampletabs} onDeleteTab={() => {}} />);
+    expect(screen.getByText('First tab')).toBeInTheDocument();
+    expect(screen.getByText('Second tab')).toBeInTheDocument();
   });
 
-  it('calls onEditSnippet when an edit action is performed on a snippet', () => {
-    const handleEditSnippet = jest.fn();
-    render(<SnippetList snippets={sampleSnippets} onEditSnippet={handleEditSnippet} onDeleteSnippet={() => {}} />);
+  it('calls onEditTab when an edit action is performed on a tab', () => {
+    const handleEditTab = jest.fn();
+    render(<TabsList tabs={sampletabs} onDeleteTab={() => {}} />);
 
-    // Simulate edit action on the first snippet
+    // Simulate edit action on the first tab
     fireEvent.click(screen.getAllByText('Edit')[0]);
-    fireEvent.change(screen.getByDisplayValue('First snippet'), {
-      target: { value: 'Updated first snippet' },
+    fireEvent.change(screen.getByDisplayValue('First tab'), {
+      target: { value: 'Updated first tab' },
     });
     fireEvent.click(screen.getByText('Save'));
 
-    expect(handleEditSnippet).toHaveBeenCalledWith(sampleSnippets[0].id, 'Updated first snippet');
+    expect(handleEditTab).toHaveBeenCalledWith(sampletabs[0].id, 'Updated first tab');
   });
 
-  it('calls onDeleteSnippet when a delete action is performed on a snippet', () => {
-    const handleDeleteSnippet = jest.fn();
-    render(<SnippetList snippets={sampleSnippets} onEditSnippet={() => {}} onDeleteSnippet={handleDeleteSnippet} />);
+  it('calls onDeleteTab when a delete action is performed on a tab', () => {
+    const handleDeleteTab = jest.fn();
+    render(<TabsList tabs={sampletabs} onDeleteTab={handleDeleteTab} />);
 
-    // Simulate delete action on the second snippet
+    // Simulate delete action on the second tab
     fireEvent.click(screen.getAllByText('Delete')[1]);
 
-    expect(handleDeleteSnippet).toHaveBeenCalledWith(sampleSnippets[1].id);
+    expect(handleDeleteTab).toHaveBeenCalledWith(sampletabs[1].id);
   });
 });
