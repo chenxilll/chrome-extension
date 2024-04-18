@@ -9,7 +9,7 @@ function App() {
   // const [tabs, setTabs] = useState<Tab[]>([]);
   const [tabsByCategory, setTabsByCategory] = useState<{ [key: string]: Tab[] }>({});
   const [fullTabsByCategory, setFullTabsByCategory] = useState<{ [key: string]: Tab[] }>({});
-  const [selectedThresholds, setSelectedThresholds] = useState<number[]>([]);
+  const [selectedThresholds, setSelectedThresholds] = useState<number[]>([0,1,2,3,4]);
 
   // Define the list of thresholds and their corresponding category names
   const thresholds = [
@@ -72,28 +72,6 @@ function App() {
     setTabsByCategory(filteredTabs);
   }, [selectedThresholds, fullTabsByCategory]);
 
-  // // Handler for deleting a tab
-  // const handleDeleteTab = (id: number) => {
-  //   // Retrieve tabs from local storage
-  //   chrome.storage.local.get('tabs', (result) => {
-  //     if (result.tabs) {
-  //       // Find the tab with the provided ID
-  //       const tabToDelete = result.tabs.find((tab: Tab) => tab.id === id);
-  //       if (tabToDelete) {
-  //         const { id: mainId, tabId } = tabToDelete; // Extract mainId and tabId
-
-  //         // Remove the tab from local storage
-  //         const updatedTabs = result.tabs.filter((tab: Tab) => tab.id !== mainId);
-  //         chrome.storage.local.set({ tabs: updatedTabs }, () => {
-  //           // After deleting from local storage, remove the associated tab
-  //           chrome.tabs.remove(tabId, () => {
-  //             console.log(`Tab ${tabId} removed.`);
-  //           });
-  //         });
-  //       }
-  //     }
-  //   });
-  // };
   // Handler for deleting a tab
 const handleDeleteTab = (id: number) => {
   // Retrieve tabs from local storage
