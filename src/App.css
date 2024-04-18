@@ -1,25 +1,61 @@
 .App {
-    color: black;
-    text-align: center;
-  }
-  
-  .container {
-    width: 400px;
-    padding: 1rem;
-    background-color: white;
-  }
-  
-  .tabs-list {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .tab-item {
-    margin-bottom: 1rem;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-  }
-  
-  .tab-item button {
-    margin-left: 0.5rem;
-  }
+  color: black;
+  text-align: center;
+}
+
+.container {
+  width: 400px;
+  padding: 1rem;
+  background-color: white;
+}
+
+.tabs-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.tab-item {
+  list-style: none;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tab-item span {
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+}
+
+.tab-item div {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.tab-item button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: #d32020;
+  color: white;
+  text-transform: uppercase;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.tab-item button:hover {
+  background-color: #0056b3;
+}
+
+.tab-item button:active {
+  background-color: #004085;
+}

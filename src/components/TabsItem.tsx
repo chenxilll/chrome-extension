@@ -25,15 +25,13 @@ export const TabsItem: React.FC<TabsItemProps> = ({ tab, onDelete }) => {
 
   return (
     <li className="tab-item">
-      {
-        <div>
-          <span onClick={handleUrlClick} style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }}>
-            {title}
-          </span>
-          <div>{timestamp}</div>
-          <button onClick={() => onDelete(tab.tabId)}>Delete</button>
-        </div>
-      }
+      <div>
+        <span onClick={handleUrlClick} className="tab-title">
+          {title}
+        </span>
+        <div className="tab-timestamp">{timestamp}</div>
+      </div>
+      <button onClick={() => onDelete(tab.tabId)}>Delete</button>
     </li>
   );
 };
