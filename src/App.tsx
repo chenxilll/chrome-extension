@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { Tab, TabsList } from './components/TabsList';
+import { tabs } from 'sinon-chrome';
 
 
 function App() {
   // Define the state variable for storing the list of tabs
   // const [tabs, setTabs] = useState<Tab[]>([]);
   const [tabsByCategory, setTabsByCategory] = useState<{ [key: string]: Tab[] }>({});
+  const [fullTabsByCategory, setFullTabsByCategory] = useState<{ [key: string]: Tab[] }>({});
   const [selectedThresholds, setSelectedThresholds] = useState<number[]>([]);
 
   // Define the list of thresholds and their corresponding category names
@@ -33,7 +35,7 @@ function App() {
           }
           sortedTabs[category].push(tab);
         });
-        setTabsByCategory(sortedTabs);
+        setFullTabsByCategory(sortedTabs);
       }
       if (result.selectedThresholds) {
         setSelectedThresholds(result.selectedThresholds);
@@ -59,16 +61,16 @@ function App() {
   // Filter tabs based on selected thresholds
   useEffect(() => {
     const filteredTabs: { [key: string]: Tab[] } = {};
-    for (const category in tabsByCategory) {
-      if (tabsByCategory.hasOwnProperty(category)) {
+    for (const category in fullTabsByCategory) {
+      if (fullTabsByCategory.hasOwnProperty(category)) {
         const thresholdIndex = thresholds.findIndex(threshold => threshold.category === category);
         if (selectedThresholds.includes(thresholdIndex)) {
-          filteredTabs[category] = tabsByCategory[category];
+          filteredTabs[category] = fullTabsByCategory[category];
         }
       }
     }
     setTabsByCategory(filteredTabs);
-  }, [selectedThresholds]);
+  }, [selectedThresholds, fullTabsByCategory]);
 
   // // Handler for deleting a tab
   // const handleDeleteTab = (id: number) => {
@@ -116,6 +118,7 @@ const handleDeleteTab = (id: number) => {
               }
             }
             setTabsByCategory(updatedTabsByCategory);
+            setFullTabsByCategory(updatedTabsByCategory);
           });
         });
       }
