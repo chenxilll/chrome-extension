@@ -11,6 +11,12 @@ function App() {
   const [fullTabsByCategory, setFullTabsByCategory] = useState<{ [key: string]: Tab[] }>({});
   const [selectedThresholds, setSelectedThresholds] = useState<number[]>([0,1,2,3,4]);
 
+  const [isSwitchOn, setIsSwitchOn] = useState(false);
+
+  const toggleSwitch = () => {
+    setIsSwitchOn(!isSwitchOn);
+  };
+
   // Define the list of thresholds and their corresponding category names
   const thresholds = [
     { threshold: 7, category: 'Over a week' },
@@ -117,31 +123,41 @@ const handleDeleteTab = (id: number) => {
     setSelectedThresholds(updatedThresholds);
   };
 
-  return (
-    <div className="App">
-      <h1>TabsOFF</h1>
-      <div>
-        {thresholds.map((threshold, index) => (
-          <div key={index}>
-            <input
-              type="checkbox"
-              checked={selectedThresholds.includes(index)}
-              onChange={() => handleThresholdToggle(index)}
-            />
-            <label>{threshold.category}</label>
-          </div>
-        ))}
-        {Object.keys(tabsByCategory).map(category => (
-          <TabsList
-            key={category}
-            title={category}
-            tabs={tabsByCategory[category]}
-            onDeleteTab={handleDeleteTab}
-          />
-        ))}
-      </div>
+return (
+  <div className="App">
+  <div className="logo-container" onClick={toggleSwitch}>
+    <span className="logo-text">Tabs</span>
+    <svg className="logo-svg" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+          <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="4" stdDeviation="3" floodColor="#000000" floodOpacity="0.3"/>
+          </filter>
+        </defs>
+    <rect x="0" y="25" width="60" height="30" rx="15" fill={isSwitchOn ? "#4CAF50" : "#f44336"}/>
+    <circle cx={isSwitchOn ? "45" : "15"} cy="40" r="12" fill="#FFF"/> 
+    </svg>
+  </div>
+    <div>
+      {thresholds.map((threshold, index) => (
+        <button
+          key={index}
+          className={selectedThresholds.includes(index) ? 'threshold-button selected' : 'threshold-button'}
+          onClick={() => handleThresholdToggle(index)}
+        >
+          {threshold.category}
+        </button>
+      ))}
+      {Object.keys(tabsByCategory).map(category => (
+        <TabsList
+          key={category}
+          title={category}
+          tabs={tabsByCategory[category]}
+          onDeleteTab={handleDeleteTab}
+        />
+      ))}
     </div>
-  );
+  </div>
+);
 }
 
 export default App;

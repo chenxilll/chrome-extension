@@ -1,6 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
 .App {
   color: black;
   text-align: center;
+  max-width: 800px; 
+  margin: 0 auto; 
 }
 
 .container {
@@ -58,4 +62,78 @@
 
 .tab-item button:active {
   background-color: #004085;
+}
+
+.threshold-buttons-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px; 
+  margin-bottom: 20px; 
+}
+
+.threshold-button {
+  padding: 10px 20px;
+  margin-right: 10px; 
+  margin-bottom: 10px; 
+  border: none;
+  border-radius: 20px;
+  background-color: #fff;
+  color: #333;
+  font-size: 16px;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.threshold-button:hover {
+  background-color: #f0f0f0; 
+}
+
+.threshold-button.selected {
+  background-color: #007bff; 
+  color: #fff; 
+}
+
+.header {
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+  padding: 1rem;
+  background-color: #eceff1; 
+}
+
+.logo-image {
+  width: 150px; 
+  height: auto;
+  margin-bottom: 1rem; 
+}
+
+.logo-text {
+  font-family: 'Roboto', sans-serif; 
+  font-size: 40px;
+  color: #333;
+  margin-right: 8px; 
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.2); 
+}
+
+.logo-svg {
+  width: 50px;
+  height: auto;
+  vertical-align: middle; 
+  margin-bottom: 4px; 
+}
+
+.logo-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background: white; 
+  cursor: pointer;
+  margin-bottom: 20px; 
+  margin-top: 20px; 
 }
