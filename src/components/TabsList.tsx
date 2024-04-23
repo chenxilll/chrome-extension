@@ -16,12 +16,19 @@ export const TabsList: React.FC<TabsListProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
+  const toggleList = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
     <div>
       {title && (
-        <h2 onClick={() => setIsOpen(!isOpen)} style={{ cursor: 'pointer' }}>
-          {title} ({tabs.length})
-        </h2>
+        <div onClick={toggleList} style={{ cursor: 'pointer', position: 'relative' }}>
+          <h2 onClick={toggleList} style={{ cursor: 'pointer' }}>
+            {title} ({tabs.length})
+            <span className={`dropdown-indicator ${isOpen ? 'open' : ''}`}></span>
+          </h2>
+        </div>
       )}
       {isOpen && (
         <ul className="tabs-list">

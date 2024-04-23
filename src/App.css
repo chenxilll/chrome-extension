@@ -3,8 +3,8 @@
 .App {
   color: black;
   text-align: center;
-  max-width: 800px; 
-  margin: 0 auto; 
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .container {
@@ -68,14 +68,14 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px; 
-  margin-bottom: 20px; 
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
 .threshold-button {
   padding: 10px 20px;
-  margin-right: 10px; 
-  margin-bottom: 10px; 
+  margin-right: 10px;
+  margin-bottom: 10px;
   border: none;
   border-radius: 20px;
   background-color: #fff;
@@ -88,41 +88,41 @@
 }
 
 .threshold-button:hover {
-  background-color: #f0f0f0; 
+  background-color: #f0f0f0;
 }
 
 .threshold-button.selected {
-  background-color: #007bff; 
-  color: #fff; 
+  background-color: #007bff;
+  color: #fff;
 }
 
 .header {
   display: flex;
-  justify-content: center; 
-  align-items: center; 
+  justify-content: center;
+  align-items: center;
   padding: 1rem;
-  background-color: #eceff1; 
+  background-color: #eceff1;
 }
 
 .logo-image {
-  width: 150px; 
+  width: 150px;
   height: auto;
-  margin-bottom: 1rem; 
+  margin-bottom: 1rem;
 }
 
 .logo-text {
-  font-family: 'Roboto', sans-serif; 
+  font-family: 'Roboto', sans-serif;
   font-size: 40px;
   color: #333;
-  margin-right: 8px; 
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.2); 
+  margin-right: 8px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .logo-svg {
   width: 50px;
   height: auto;
-  vertical-align: middle; 
-  margin-bottom: 4px; 
+  vertical-align: middle;
+  margin-bottom: 4px;
 }
 
 .logo-container {
@@ -132,8 +132,28 @@
   padding: 10px;
   border-radius: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background: white; 
+  background: white;
   cursor: pointer;
-  margin-bottom: 20px; 
-  margin-top: 20px; 
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.dropdown-indicator {
+  display: inline-block;
+  margin-left: 5px;
+  transition: transform 0.3s ease;
+}
+
+.dropdown-indicator::after {
+  content: '';
+  display: inline-block;
+  vertical-align: middle;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 6px solid #333;
+  margin-left: 2px;
+}
+
+.dropdown-indicator.open::after {
+  transform: rotate(180deg);
 }
