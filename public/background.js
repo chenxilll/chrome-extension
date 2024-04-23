@@ -42,8 +42,24 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 });
 
 chrome.tabs.onCreated.addListener((tab) => {
-  chrome.storage.local.get({ tabs: [] }, (result) => {
-    const tabs = result.tabs;
+  chrome.windows.getAll({}, function(windows) {
+    if (windows.length === 1) { // Check if there is only one window open
+      chrome.tabs.query({windowId: tab.windowId}, function(tabs) {
+        if (tabs.length === 1) { // This means it's the first tab in this window
+          handleTabCreation(tab, true);
+        } else {
+          handleTabCreation(tab, false);
+        }
+      });
+    } else {
+      handleTabCreation(tab, false);
+    }
+  });
+});
+
+function handleTabCreation(tab, isNewWindow) {
+  chrome.storage.local.get({tabs: []}, function(result) {
+    let arr = result.tabs;
 
     const currentDate = new Date();
     const readableDate = currentDate.toLocaleString();
@@ -57,13 +73,30 @@ chrome.tabs.onCreated.addListener((tab) => {
       url: tab.url,
     };
 
-    tabs.push(newTab);
+    if (isNewWindow) {
+      console.log('New window opened with a new tab');
+      chrome.storage.local.set({tabs: [newTab]}, () => {
+        console.log('Tab saved with tab and window IDs');
+      });
+      chrome.storage.local.get(['tabs'], function(result) {
+        console.log(result);
+      });
+    } else {
+      arr.push(newTab);
+      console.log('New tab created in an existing window');
+      chrome.storage.local.set({tabs: arr}, () => {
+        console.log('Tab saved with tab and window IDs');
+      });
+      chrome.storage.local.get(['tabs'], function(result) {
+        console.log(result);
+      });
+    }
 
-    chrome.storage.local.set({ tabs }, () => {
-      console.log('Tab saved with tab and window IDs');
-    });
+    
   });
-});
+}
+
+
 
 chrome.tabs.onActivated.addListener(activeInfo => {
   const tabId = activeInfo.tabId;
