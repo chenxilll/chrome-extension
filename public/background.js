@@ -22,9 +22,8 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
       // Create a new tab object with a unique ID, the selected text, and tab/window IDs
       const newTab = {
-        id: Date.now(),
+        id: tab.id,
         text: selectedText,
-        tabId: tab.id, // Associate the tab with the tab it was created in
         windowId: tab.windowId, // Associate the tab with the window it was created in
         time: Date.now(),
         url: tab.url,
@@ -65,9 +64,8 @@ function handleTabCreation(tab, isNewWindow) {
     const readableDate = currentDate.toLocaleString();
 
     const newTab = {
-      id: Date.now(),
+      id: tab.id,
       text: `${tab.url}\nCreated at: ${readableDate}`,
-      tabId: tab.id,
       windowId: tab.windowId,
       time: Date.now(),
       url: tab.url,
@@ -116,7 +114,7 @@ chrome.tabs.onActivated.addListener(activeInfo => {
         return;
       }
 
-      let found = tabs.find(tab => tab.tabId === tabId);
+      let found = tabs.find(tab => tab.id === tabId);
 
       if (found) {
         found.text = `${tab.title}\nActivated at: ${currentTime.toLocaleString()}`;
@@ -125,7 +123,6 @@ chrome.tabs.onActivated.addListener(activeInfo => {
         tabs.push({
           id: tabId,
           text: `${tab.title}\nActivated at: ${currentTime.toLocaleString()}`,
-          tabId: tabId,
           windowId: activeInfo.windowId,
           time: Date.now(),
           url: tab.url,
@@ -146,7 +143,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     chrome.storage.local.get({ tabs: [] }, (result) => {
       let tabs = result.tabs;
       tabs.sort((a, b) => a.time - b.time);
-      let found = tabs.find(tab => tab.tabId === tabId);
+      let found = tabs.find(tab => tab.id === tabId);
 
       const tabText = `${tab.title}\nUpdated at: ${currentTime.toLocaleString()}`;
 
@@ -156,7 +153,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         tabs.push({
           id: tabId,
           text: tabText,
-          tabId: tabId,
           windowId: tab.windowId,
           time: Date.now(),
           url: tab.url,
@@ -174,7 +170,7 @@ chrome.tabs.onRemoved.addListener(tabId => {
   tabIdToDelete = tabId;
   chrome.storage.local.get({ tabs: [] }, (result) => {
     let tabs = result.tabs;
-    const index = tabs.findIndex(tab => tab.tabId === tabId);
+    const index = tabs.findIndex(tab => tab.id === tabId);
     if (index !== -1) {
       tabs.splice(index, 1);
       chrome.storage.local.set({ tabs }, () => {

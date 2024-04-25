@@ -92,8 +92,8 @@ const handleDeleteTab = (id: number) => {
         const updatedTabs = result.tabs.filter((tab: Tab) => tab.id !== mainId);
         chrome.storage.local.set({ tabs: updatedTabs }, () => {
           // After deleting from local storage, remove the associated tab
-          chrome.tabs.remove(tabId, () => {
-            console.log(`Tab ${tabId} removed.`);
+          chrome.tabs.remove(id, () => {
+            console.log(`Tab ${id} removed.`);
             // Update tabsByCategory state after deletion
             const updatedTabsByCategory = { ...tabsByCategory };
             for (const category in updatedTabsByCategory) {
@@ -101,7 +101,6 @@ const handleDeleteTab = (id: number) => {
                 updatedTabsByCategory[category] = updatedTabsByCategory[category].filter(tab => tab.id !== mainId);
               }
             }
-            setTabsByCategory(updatedTabsByCategory);
             setFullTabsByCategory(updatedTabsByCategory);
           });
         });

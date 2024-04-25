@@ -4,7 +4,6 @@ export interface Tab {
   id: number;
   text: string;
   url: string;
-  tabId: number;
   time: string;
 }
 
@@ -19,7 +18,7 @@ export const TabsItem: React.FC<TabsItemProps> = ({ tab, onDelete }) => {
   const handleUrlClick = () => {
     chrome.runtime.sendMessage({
       action: 'navigateToTab',
-      tabId: tab.tabId,
+      tabId: tab.id,
     });
   };
 
@@ -31,7 +30,7 @@ export const TabsItem: React.FC<TabsItemProps> = ({ tab, onDelete }) => {
         </span>
         <div className="tab-timestamp">{timestamp}</div>
       </div>
-      <button onClick={() => onDelete(tab.tabId)}>Delete</button>
+      <button onClick={() => onDelete(tab.id)}>Delete</button>
     </li>
   );
 };
