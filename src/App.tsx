@@ -67,7 +67,7 @@ function App() {
   // Filter tabs based on selected thresholds
   useEffect(() => {
     const filteredTabs: { [key: string]: Tab[] } = {};
-    for (const category in fullTabsByCategory) {
+    for (const { threshold, category } of thresholds) {
       if (fullTabsByCategory.hasOwnProperty(category)) {
         const thresholdIndex = thresholds.findIndex(threshold => threshold.category === category);
         if (selectedThresholds.includes(thresholdIndex)) {
