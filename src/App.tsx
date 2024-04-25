@@ -99,6 +99,9 @@ const handleDeleteTab = (id: number) => {
             for (const category in updatedTabsByCategory) {
               if (updatedTabsByCategory.hasOwnProperty(category)) {
                 updatedTabsByCategory[category] = updatedTabsByCategory[category].filter(tab => tab.id !== mainId);
+                if (updatedTabsByCategory[category].length === 0) {
+                  delete updatedTabsByCategory[category];
+                }
               }
             }
             setFullTabsByCategory(updatedTabsByCategory);
