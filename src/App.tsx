@@ -28,6 +28,7 @@ function App() {
 
   useEffect(() => {
     chrome.storage.local.get(['tabs', 'selectedThresholds'], (result) => {
+      cleanupMissingTabs();
       if (result.tabs) {
         const now = Date.now();
         const sortedTabs: { [key: string]: Tab[] } = {};
@@ -46,8 +47,6 @@ function App() {
       if (result.selectedThresholds) {
         setSelectedThresholds(result.selectedThresholds);
       }
-
-      cleanupMissingTabs();
     });
   }, []);
 
