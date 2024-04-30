@@ -46,6 +46,8 @@ function App() {
       if (result.selectedThresholds) {
         setSelectedThresholds(result.selectedThresholds);
       }
+
+      cleanupMissingTabs();
     });
   }, []);
 
@@ -124,6 +126,23 @@ const handleDeleteTab = (id: number) => {
     }
     setSelectedThresholds(updatedThresholds);
   };
+
+// Function to remove missing tabs
+const cleanupMissingTabs = () => {
+  chrome.tabs.query({}, (currentTabs: any[]) => {
+    const currentTabIds = currentTabs.map(tab => tab.id);
+
+    chrome.storage.local.get('tabs', (result: { tabs?: Tab[] }) => {
+      if (result.tabs) {
+        const updatedTabs = result.tabs.filter((tab: Tab) => currentTabIds.includes(tab.id));
+        chrome.storage.local.set({ tabs: updatedTabs }, () => {
+          console.log("Tabs in local storage updated after cleanup.");
+        });
+      }
+    });
+  });
+};
+
 
 return (
   <div className="App">
