@@ -10,7 +10,7 @@ To install TabsOFF, follow these steps:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/tabs-off.git
+   git clone https://github.com/your-username/chrome-extension.git
    ```
    
 2. Navigate to the project directory:
