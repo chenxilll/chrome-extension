@@ -37,8 +37,9 @@ After building, load the unpacked extension into Chrome through the Extensions m
 This project follows the Manifest V3 architecture for Chrome extensions. Key components of the architecture include:
 
 - `manifest.json`: Defines the extension's metadata, permissions, and script configurations
-- `background.js`: Runs in the background and handles events and long-running tasks
-- `contentScript.js`: Injected into web pages to interact with the DOM and communicate with the background script **(not used here)**
+- `background.js`: Manages Chrome events, such as tab creation, update, activation, and removal, and integrates context menu interactions, while persisting tab information in local storage
+- `contentScript.js`: Injects into web pages to capture user-selected text via mouse events and communicates this data to the background script for processing and storage
+- `App.tsx`: Manages state, handles user interactions, and dynamically organizes browser tabs into categories based on user-defined thresholds
 - Popup window: Displays the extension's user interface when the extension icon is clicked
 
 
