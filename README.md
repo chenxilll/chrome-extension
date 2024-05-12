@@ -4,6 +4,22 @@
 
 TabsOFF is a Chrome Extension designed to enhance productivity and efficiency for web users by organizing and managing open browser tabs. It helps users reduce clutter, improve memory usage on their PCs, and navigate open tabs more effectively.
 
+## Screenshots
+
+TabsOFF provides an intuitive interface to help users manage browser tabs efficiently. Here are screenshots demonstrating its key features:
+
+### Popup Interface
+
+![Popup Interface](/screenshot-popup-interface.png)
+
+The Popup interface allows users to quickly sort tabs based on how long they've been open. Options include sorting tabs that have been open for more than a week, more than half a day, more than 20 seconds, or more than 10 seconds. This feature is instrumental in managing tab clutter and improving browser performance.
+
+### Tab Management
+
+![Tab Management](/screenshot-tab-management.png)
+
+Tabs are organized and displayed according to the duration they have been open. The interface updates dynamically as new tabs meet the time criteria set by the user, making it easy to track and manage extensive browsing sessions.
+
 ## Installation
 
 To install TabsOFF, follow these steps:
