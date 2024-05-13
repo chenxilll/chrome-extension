@@ -45,8 +45,15 @@ To build the extension, run:
    npm run build
    ```
 
-After building, load the unpacked extension into Chrome through the Extensions menu by enabling Developer mode and selecting 'Load unpacked extension'. Navigate to the build directory and select it.
+Load the extension in Chrome:
 
+1. **Open Chrome:** Navigate to `chrome://extensions` in your Chrome browser.
+
+2. **Enable Developer Mode:** Toggle on the 'Developer mode' at the top-right of the Extensions page.
+
+3. **Load Extension:**
+   - Click on `Load unpacked`.
+   - Select the `dist` directory from the project folder
 
 ## Chrome Extension Architecture
 
