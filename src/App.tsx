@@ -9,7 +9,7 @@ function App() {
   // const [tabs, setTabs] = useState<Tab[]>([]);
   const [tabsByCategory, setTabsByCategory] = useState<{ [key: string]: Tab[] }>({});
   const [fullTabsByCategory, setFullTabsByCategory] = useState<{ [key: string]: Tab[] }>({});
-  const [selectedThresholds, setSelectedThresholds] = useState<number[]>([0,1,2,3,4]);
+  const [selectedThresholds, setSelectedThresholds] = useState<number[]>([0, 1, 2, 3, 4]);
 
   const [isSwitchOn, setIsSwitchOn] = useState(false);
 
@@ -19,11 +19,11 @@ function App() {
 
   // Define the list of thresholds and their corresponding category names
   const thresholds = [
-    { threshold: 7, category: 'Over a week' },
+    { threshold: 0, category: 'Recent' },
     { threshold: 0.5, category: 'More than half a day' },
-    { threshold: 20*1000/(1000 * 3600 * 24), category: 'More than 20s' },
-    { threshold: 10*1000/(1000 * 3600 * 24), category: 'More than 10s' },
-    { threshold: 0, category: 'Recent' }
+    { threshold: 1, category: 'More than a day' },
+    { threshold: 3, category: 'More than 3 days' },
+    { threshold: 7, category: 'More than a week' }
   ];
 
   useEffect(() => {
@@ -80,38 +80,38 @@ function App() {
   }, [selectedThresholds, fullTabsByCategory]);
 
   // Handler for deleting a tab
-const handleDeleteTab = (id: number) => {
-  // Retrieve tabs from local storage
-  chrome.storage.local.get('tabs', (result) => {
-    if (result.tabs) {
-      // Find the tab with the provided ID
-      const tabToDelete = result.tabs.find((tab: Tab) => tab.id === id);
-      if (tabToDelete) {
-        const { id: mainId, tabId } = tabToDelete; // Extract mainId and tabId
+  const handleDeleteTab = (id: number) => {
+    // Retrieve tabs from local storage
+    chrome.storage.local.get('tabs', (result) => {
+      if (result.tabs) {
+        // Find the tab with the provided ID
+        const tabToDelete = result.tabs.find((tab: Tab) => tab.id === id);
+        if (tabToDelete) {
+          const { id: mainId, tabId } = tabToDelete; // Extract mainId and tabId
 
-        // Remove the tab from local storage
-        const updatedTabs = result.tabs.filter((tab: Tab) => tab.id !== mainId);
-        chrome.storage.local.set({ tabs: updatedTabs }, () => {
-          // After deleting from local storage, remove the associated tab
-          chrome.tabs.remove(id, () => {
-            console.log(`Tab ${id} removed.`);
-            // Update tabsByCategory state after deletion
-            const updatedTabsByCategory = { ...tabsByCategory };
-            for (const category in updatedTabsByCategory) {
-              if (updatedTabsByCategory.hasOwnProperty(category)) {
-                updatedTabsByCategory[category] = updatedTabsByCategory[category].filter(tab => tab.id !== mainId);
-                if (updatedTabsByCategory[category].length === 0) {
-                  delete updatedTabsByCategory[category];
+          // Remove the tab from local storage
+          const updatedTabs = result.tabs.filter((tab: Tab) => tab.id !== mainId);
+          chrome.storage.local.set({ tabs: updatedTabs }, () => {
+            // After deleting from local storage, remove the associated tab
+            chrome.tabs.remove(id, () => {
+              console.log(`Tab ${id} removed.`);
+              // Update tabsByCategory state after deletion
+              const updatedTabsByCategory = { ...tabsByCategory };
+              for (const category in updatedTabsByCategory) {
+                if (updatedTabsByCategory.hasOwnProperty(category)) {
+                  updatedTabsByCategory[category] = updatedTabsByCategory[category].filter(tab => tab.id !== mainId);
+                  if (updatedTabsByCategory[category].length === 0) {
+                    delete updatedTabsByCategory[category];
+                  }
                 }
               }
-            }
-            setFullTabsByCategory(updatedTabsByCategory);
+              setFullTabsByCategory(updatedTabsByCategory);
+            });
           });
-        });
+        }
       }
-    }
-  });
-};
+    });
+  };
 
 
   // Handler for toggling selected thresholds
@@ -126,58 +126,58 @@ const handleDeleteTab = (id: number) => {
     setSelectedThresholds(updatedThresholds);
   };
 
-// Function to remove missing tabs
-const cleanupMissingTabs = () => {
-  chrome.tabs.query({}, (currentTabs: any[]) => {
-    const currentTabIds = currentTabs.map(tab => tab.id);
+  // Function to remove missing tabs
+  const cleanupMissingTabs = () => {
+    chrome.tabs.query({}, (currentTabs: any[]) => {
+      const currentTabIds = currentTabs.map(tab => tab.id);
 
-    chrome.storage.local.get('tabs', (result: { tabs?: Tab[] }) => {
-      if (result.tabs) {
-        const updatedTabs = result.tabs.filter((tab: Tab) => currentTabIds.includes(tab.id));
-        chrome.storage.local.set({ tabs: updatedTabs }, () => {
-          console.log("Tabs in local storage updated after cleanup.");
-        });
-      }
+      chrome.storage.local.get('tabs', (result: { tabs?: Tab[] }) => {
+        if (result.tabs) {
+          const updatedTabs = result.tabs.filter((tab: Tab) => currentTabIds.includes(tab.id));
+          chrome.storage.local.set({ tabs: updatedTabs }, () => {
+            console.log("Tabs in local storage updated after cleanup.");
+          });
+        }
+      });
     });
-  });
-};
+  };
 
 
-return (
-  <div className="App">
-  <div className="logo-container" onClick={toggleSwitch}>
-    <span className="logo-text">Tabs</span>
-    <svg className="logo-svg" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-          <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-            <feDropShadow dx="0" dy="4" stdDeviation="3" floodColor="#000000" floodOpacity="0.3"/>
-          </filter>
-        </defs>
-    <rect x="0" y="25" width="60" height="30" rx="15" fill={isSwitchOn ? "#4CAF50" : "#f44336"}/>
-    <circle cx={isSwitchOn ? "45" : "15"} cy="40" r="12" fill="#FFF"/> 
-    </svg>
-  </div>
-    <div>
-      {thresholds.map((threshold, index) => (
-        <button
-          key={index}
-          className={selectedThresholds.includes(index) ? 'threshold-button selected' : 'threshold-button'}
-          onClick={() => handleThresholdToggle(index)}
-        >
-          {threshold.category}
-        </button>
-      ))}
-      {Object.keys(tabsByCategory).map(category => (
-        <TabsList
-          key={category}
-          title={category}
-          tabs={tabsByCategory[category]}
-          onDeleteTab={handleDeleteTab}
-        />
-      ))}
+  return (
+    <div className="App">
+      <div className="logo-container" onClick={toggleSwitch}>
+        <span className="logo-text">Tabs</span>
+        <svg className="logo-svg" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="4" stdDeviation="3" floodColor="#000000" floodOpacity="0.3" />
+            </filter>
+          </defs>
+          <rect x="0" y="25" width="60" height="30" rx="15" fill={isSwitchOn ? "#4CAF50" : "#f44336"} />
+          <circle cx={isSwitchOn ? "45" : "15"} cy="40" r="12" fill="#FFF" />
+        </svg>
+      </div>
+      <div>
+        {thresholds.map((threshold, index) => (
+          <button
+            key={index}
+            className={selectedThresholds.includes(index) ? 'threshold-button selected' : 'threshold-button'}
+            onClick={() => handleThresholdToggle(index)}
+          >
+            {threshold.category}
+          </button>
+        ))}
+        {Object.keys(tabsByCategory).map(category => (
+          <TabsList
+            key={category}
+            title={category}
+            tabs={tabsByCategory[category]}
+            onDeleteTab={handleDeleteTab}
+          />
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
 }
 
 export default App;
