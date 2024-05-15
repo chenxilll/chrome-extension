@@ -5,6 +5,7 @@
 TabsOFF is a Chrome Extension designed to enhance productivity and efficiency for web users by organizing and managing open browser tabs. It helps users reduce clutter, improve memory usage on their PCs, and navigate open tabs more effectively.
 
 Landing Page: https://github.com/Brian-program/TabsOFF-Landing-Page
+Development Team: Ani Petrosyan, Boya Zeng, Brian Lu, Chenxi Leng
 
 ## Screenshots
 
@@ -21,6 +22,9 @@ The Popup interface allows users to quickly sort tabs based on how long they've 
 ![Tab Management](/screenshot-tab-management.png)
 
 Tabs are organized and displayed according to the duration they have been open. The interface updates dynamically as new tabs meet the time criteria set by the user, making it easy to track and manage extensive browsing sessions.
+
+## Video Demonstration
+Watch our video demonstrating TabsOFF's features and benefits: https://www.youtube.com/watch?v=pb-IMMrBP1I
 
 ## Installation
 
@@ -83,6 +87,9 @@ To generate a coverage report:
 ```bash
 npm run coverage
 ```
+
+## Reporting Issues
+If you encounter any issues or bugs, please report them by opening an issue on our GitHub repository. Provide detailed information about the problem, including steps to reproduce it, screenshots, and any relevant error messages.
 
 ## Contributing
 Interested in contributing to TabsOFF? We welcome contributions of all forms. Here's how you can help:
