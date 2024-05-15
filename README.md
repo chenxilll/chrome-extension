@@ -5,6 +5,7 @@
 TabsOFF is a Chrome Extension designed to enhance productivity and efficiency for web users by organizing and managing open browser tabs. It helps users reduce clutter, improve memory usage on their PCs, and navigate open tabs more effectively.
 
 Landing Page: https://github.com/Brian-program/TabsOFF-Landing-Page
+
 Development Team: Ani Petrosyan, Boya Zeng, Brian Lu, Chenxi Leng
 
 ## Screenshots
